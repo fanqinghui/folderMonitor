@@ -10,29 +10,28 @@ import (
 	"time"
 )
 
-var FolerPath = "C:\\Users\\Administrator\\Desktop\\考核"
+var FolerPath = "//data//research"
 var FileType = ".zip"
 var TimeFormat = "2018-01-01 00:00:00"
 
 func main() {
 
 	fileChan := make(chan int, 1)
-	ticker := time.NewTicker(time.Minute * 1)
+	ticker := time.NewTicker(time.Hour * 168) //每个周清理一次
 
 	go func() {
 		for {
 			//now := time.Now()
 			// 计算下一个零点
-			//			next := now.Add(time.Hour * 24)
-			//			next = time.Date(next.Year(), next.Month(), next.Day(), 0, 0, 0, 0, next.Location())
-			//			time.NewTimer(next.Sub(now))
-			select {
+			//next := now.Add(time.Hour * 24)
+			//next = time.Date(next.Year(), next.Month(), next.Day(), 0, 0, 0, 0, next.Location())
+			//time.NewTimer(next.Sub(now))
+			select { //就是监听 IO 操作,case 语句里面必须是一个IO操作（面向channel的Io操作）
 			case <-ticker.C:
 				delZipFile()
 			}
 		}
 	}()
-	//阻塞主线程
 	<-fileChan
 }
 
@@ -44,12 +43,9 @@ func delZipFile() {
 	}
 	filepath.Walk(FolerPath, func(fileName string, file os.FileInfo, err error) error {
 		if !file.IsDir() && strings.HasSuffix(file.Name(), FileType) {
-			//			fileTime := file.ModTime().Unix()
-			//			fmt.Printf("%s", fileTime)
 			fmt.Println(file.Name())
 			os.Remove(fileName)
 		}
 		return nil
-
 	})
 }
